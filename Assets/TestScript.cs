@@ -13,16 +13,30 @@ public class TestScript : MonoBehaviour
 
     void Start()
     {
+        AsyncIO.ForceDotNet.Force();
         Debug.Log("Connecting to test server");
         publisher = new PublisherSocket();
         publisher.Bind("tcp://*:6666");
         data = new byte[SIZE];
+
+        InvokeRepeating(nameof(Send), 0.0f, 1.0f / 20.0f);
+    }
+
+    void Send()
+    {
+        counter++;
+        Debug.Log(counter);
+        publisher.SendFrame(data);
     }
 
     void Update()
     {
-        Debug.Log($"Sending");
-        publisher.SendFrame(data);
-        counter++;
+
+    }
+
+    void OnDestroy()
+    {
+        publisher.Dispose();
+        NetMQConfig.Cleanup();
     }
 }
